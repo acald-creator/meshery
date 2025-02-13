@@ -27,7 +27,7 @@ Some examples include:
   - Examples: Storage and retrieval of performance test results.
   - Examples: Storage and retrieval of user preferences.
 - **Enhanced Visualization**
-  - Examples: Creation of a visual service mesh topology.
+  - Examples: Creation of a visual cloud native infrastructure topology.
   - Examples: Different charts (metrics), debug (log viewer), distributed trace explorers.
 - **Reporting**
   - Examples: Using Meshery's GraphQL server to compose new dashboards.
@@ -96,6 +96,10 @@ Meshery's Remote Provider extensibility framework is designed to enable the foll
 Meshery interfaces with providers through a Go interface. The Provider implementations have to be placed in the code and compiled together today. A Provider instance will have to be injected into Meshery when the program starts.
 
 Meshery keeps the implementation of Remote Providers separate so that they are brought in through a separate process and injected into Meshery at runtime (OR) change the way the code works to make the Providers invoke Meshery.
+
+### Verifying Compatibility With Golang Version Update
+
+When Meshery is updated to a newer version of Golang, extension providers need to ensure their integrations remain compatible with the updated version. Changes in the Golang version can lead to compatibility issues, so it’s important to update your extension to align with Meshery’s new environment. For a detailed guide on how to verify and address any compatibility issues, refer to this [guide on verifying compatibility](./verify-compatibility).
 
 ### Remote Provider Extension Points
 

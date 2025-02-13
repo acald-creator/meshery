@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import MenuIcon from '@material-ui/icons/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from 'next/router';
 import { Provider, connect } from 'react-redux';
 import { store } from '../store';
@@ -12,8 +12,9 @@ import { EVENT_TYPES } from 'lib/event-types';
 import CAN from '@/utils/can';
 import { keys } from '@/utils/permission_constants';
 import { NavigationNavbar } from '@layer5/sistent';
-import { Popover, IconButton } from '@material-ui/core';
-import theme from '@/themes/app';
+import { Popover } from '@mui/material';
+import { UsesSistent } from './SistentWrapper';
+import { IconButtonAvatar } from './Header.styles';
 
 function exportToJsonFile(jsonData, filename) {
   let dataStr = JSON.stringify(jsonData);
@@ -152,15 +153,10 @@ const HeaderMenu = (props) => {
   const id = open ? 'menu-popover' : undefined;
 
   return (
-    <div>
-      <IconButton
-        aria-describedby={id}
-        onClick={handleClick}
-        color={props.color}
-        className={props.iconButtonClassName}
-      >
+    <UsesSistent>
+      <IconButtonAvatar aria-describedby={id} onClick={handleClick} color={props.color}>
         <MenuIcon />
-      </IconButton>
+      </IconButtonAvatar>
 
       <Popover
         id={id}
@@ -182,14 +178,13 @@ const HeaderMenu = (props) => {
           ListItemTextProps={{
             primaryTypographyProps: {
               sx: {
-                fontFamily: theme.typography.fontFamily,
                 fontSize: '1rem',
               },
             },
           }}
         />
       </Popover>
-    </div>
+    </UsesSistent>
   );
 };
 

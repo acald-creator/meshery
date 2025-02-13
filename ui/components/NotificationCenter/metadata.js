@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Grid, Box, List, ListItem } from '@layer5/sistent';
-import { Launch as LaunchIcon } from '@material-ui/icons';
+import { Typography, Grid, Box, List, ListItem, RenderMarkdown } from '@layer5/sistent';
+import { Launch as LaunchIcon } from '@mui/icons-material';
 import {
   FormatStructuredData,
   SectionBody,
@@ -220,12 +220,13 @@ export const ErrorMetadataFormatter = ({ metadata, event }) => {
         <Typography variant="body1">
           <strong>{heading}</strong>
         </Typography>
-        <List sx={{}}>
+        <List sx={{ listStyleType: 'decimal' }}>
           {value.map((error, idx) => (
-            <ListItem key={idx}>
-              <Box>
-                <Typography variant="body1">{error}</Typography>
-              </Box>
+            <ListItem
+              key={idx}
+              sx={{ display: 'list-item', paddingLeft: '0.1rem', marginLeft: '1rem' }}
+            >
+              <RenderMarkdown content={error} />
             </ListItem>
           ))}
         </List>

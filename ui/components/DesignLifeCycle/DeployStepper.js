@@ -18,10 +18,7 @@ import CheckIcon from '@/assets/icons/CheckIcon';
 import { useLegacySelector } from 'lib/store';
 import { DeploymentTargetContext, SelectTargetEnvironments } from './SelectDeploymentTarget';
 import { FinalizeDeployment } from './finalizeDeployment';
-import {
-  selectAllSelectedK8sConnections,
-  selectSelectedEnvs,
-} from '@/store/slices/globalEnvironmentContext';
+import { selectAllSelectedK8sConnections } from '@/store/slices/globalEnvironmentContext';
 import {
   useDryRunValidationResults,
   useIsValidatingDryRun,
@@ -39,6 +36,8 @@ import FinishFlagIcon from '@/assets/icons/FinishFlagIcon';
 import { DeploymentSummaryFormatter } from './DeploymentSummary';
 import { SEVERITY } from '../NotificationCenter/constants';
 import EnvironmentModal from '../Modals/EnvironmentModal';
+import { openViewScopedToDesignInOperator } from '@/utils/utils';
+import { useRouter } from 'next/router';
 
 export const ValidateContent = {
   btnText: 'Next',
@@ -64,6 +63,7 @@ export const FinishDeploymentStep = ({ perform_deployment, deployment_type, auto
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployEvent, setDeployEvent] = useState();
   const [deployError, setDeployError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     try {
@@ -83,12 +83,13 @@ export const FinishDeploymentStep = ({ perform_deployment, deployment_type, auto
         if (serverEvent.action === deployment_type) {
           setIsDeploying(false);
           setDeployEvent(serverEvent);
-          if (
-            autoOpenView &&
-            serverEvent.severity == SEVERITY.SUCCESS &&
-            serverEvent?.metadata?.view_url
-          ) {
-            window.open(serverEvent.metadata.view_url, '_blank');
+
+          if (autoOpenView && serverEvent.severity == SEVERITY.SUCCESS) {
+            openViewScopedToDesignInOperator(
+              serverEvent?.metadata?.design_name,
+              serverEvent?.metadata?.design_id,
+              router,
+            );
           }
         }
       },
@@ -193,10 +194,8 @@ export const UpdateDeploymentStepper = ({
 }) => {
   const [includeDependencies, setIncludeDependencies] = useState(false);
   const [bypassDryRun, setBypassDryRun] = useState(false);
-  const [openInVisualizer, setOpenInVisualizer] = useState(false);
+  const [openInOperator, setOpenInOperator] = useState(false);
 
-  const selectedEnvironments = useSelectorRtk(selectSelectedEnvs);
-  const selectedEnvCount = Object.keys(selectedEnvironments).length;
   const dryRunErrors = useDryRunValidationResults(validationMachine);
   const totalDryRunErrors = getTotalCountOfDeploymentErrors(dryRunErrors);
   const isDryRunning = useIsValidatingDryRun(validationMachine);
@@ -270,8 +269,8 @@ export const UpdateDeploymentStepper = ({
             <FinalizeDeployment
               design={design}
               deployment_type={deployment_type}
-              openInVisualizer={openInVisualizer}
-              setOpenInVisualizer={setOpenInVisualizer}
+              openInVisualizer={openInOperator}
+              setOpenInVisualizer={setOpenInOperator}
             />
           </StepContent>
         ),
@@ -288,7 +287,7 @@ export const UpdateDeploymentStepper = ({
               design={design}
               deployment_type={deployment_type}
               perform_deployment={actionFunction}
-              autoOpenView={openInVisualizer}
+              autoOpenView={openInOperator}
             />{' '}
           </StepContent>
         ),
@@ -307,7 +306,7 @@ export const UpdateDeploymentStepper = ({
       nextAction: () => deployStepper.handleNext(),
     },
     1: {
-      canGoNext: () => selectedEnvCount > 0,
+      canGoNext: () => selectedK8sConnections.length > 0,
       nextButtonText: 'Next',
       nextAction: () => deployStepper.handleNext(),
     },
@@ -336,7 +335,7 @@ export const UpdateDeploymentStepper = ({
   return (
     <>
       <ModalBody style={{ padding: 0 }}>
-        <Box style={{ maxWidth: '40rem' }}>
+        <Box>
           <CustomizedStepper {...deployStepper} ContentWrapper={StepWrapper}>
             {deployStepper.activeStepComponent}
           </CustomizedStepper>

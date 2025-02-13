@@ -1,6 +1,5 @@
-import { Button, Grid, IconButton, Typography, styled } from '@layer5/sistent';
+import { Button, Grid, IconButton, Typography, styled, useTheme } from '@layer5/sistent';
 import { UsesSistent } from './SistentWrapper';
-import { useTheme } from '@material-ui/core';
 import CloseIcon from '@mui/icons-material/Close';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -8,6 +7,7 @@ import { connect } from 'react-redux';
 import Cookies from 'universal-cookie';
 import { mesheryExtensionRoute } from '../pages/_app';
 import { Colors } from '@/themes/app';
+import { EXTENSION_NAMES, EXTENSIONS } from '@/utils/Enum';
 
 const StyledPaper = styled('div')(({ theme }) => ({
   position: 'fixed',
@@ -111,18 +111,19 @@ export function MesheryExtensionEarlyAccessCard({
   closeForm = () => {},
   capabilitiesRegistry,
 }) {
+  const extension = EXTENSIONS[EXTENSION_NAMES.KANVAS];
   const signUpText = 'Sign up';
-  const signupHeader = 'Get early access to Kanvas!';
+  const signupHeader = extension.signup_header || '';
   const [buttonText, setButtonText] = useState(signUpText);
   const [title, setTitle] = useState(signupHeader);
   const { push } = useRouter();
   const theme = useTheme();
   const popupImageSrc =
-    theme.palette.type === 'dark' ? '/static/img/aws.svg' : '/static/img/aws-light.svg';
+    theme.palette.mode === 'dark' ? '/static/img/aws.svg' : '/static/img/aws-light.svg';
 
   const handleButtonClick = (e) => {
     if (buttonText === signUpText) {
-      window.open('https://layer5.io/cloud-native-management/kanvas', '_blank');
+      window.open(extension.signup_url, '_blank');
     } else {
       push(mesheryExtensionRoute);
     }
@@ -133,7 +134,7 @@ export function MesheryExtensionEarlyAccessCard({
     const isMesheryExtensionUser = isMesheryExtensionRegisteredUser(capabilitiesRegistry);
     if (isMesheryExtensionUser) {
       setTitle('Collaborative management enabled');
-      setButtonText('Open Kanvas');
+      setButtonText(extension.signup_button);
     } else {
       setTitle(signupHeader);
       setButtonText(signUpText);
